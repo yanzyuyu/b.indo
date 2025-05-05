@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ujian Literasi Membaca Bahasa Indonesia</title>
+    <style>
+        :root {
+            --primary: #4a6fa5;
+            --secondary: #166088;
+            --accent: #4fc3f7;
+            --background: #f5f7fa;
+            --text: #333;
+            --correct: #4caf50;
+            --incorrect: #f44336;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background-color: var(--background);
+            margin: 0;
+            padding: 0;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 20px;
+            border-radius: 8px 8px 0 0;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 24px;
+            text-align: center;
+        }
+        
+        .exam-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        
+        .question-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .question-container:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .question-number {
+            font-weight: bold;
+            color: var(--secondary);
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .question-text {
+            margin-bottom: 15px;
+        }
+        
+        .options {
+            margin-left: 20px;
+        }
+        
+        .option {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .option:hover {
+            background-color: #e3f2fd;
+        }
+        
+        .option input {
+            margin-right: 10px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: var(--secondary);
+        }
+        
+        #submit-btn {
+            background-color: var(--correct);
+        }
+        
+        #submit-btn:hover {
+            background-color: #388e3c;
+        }
+        
+        #result-container {
+            display: none;
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        #score {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+        
+        .progress-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        
+        #progress-bar {
+            height: 20px;
+            border-radius: 5px;
+            background-color: var(--accent);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .timer {
+            background-color: var(--secondary);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .highlight {
+            background-color: #fffde7;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        
+        .correct-answer {
+            background-color: #e8f5e9;
+            border-left: 4px solid var(--correct);
+        }
+        
+        .incorrect-answer {
+            background-color: #ffebee;
+            border-left: 4px solid var(--incorrect);
+        }
+        
+        .feedback {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+        
+        .correct-feedback {
+            background-color: #e8f5e9;
+            color: var(--correct);
+            display: none;
+        }
+        
+        .incorrect-feedback {
+            background-color: #ffebee;
+            color: var(--incorrect);
+            display: none;
+        }
+        
+        .tab {
+            display: none;
+        }
+        
+        .active-tab {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .tab-buttons {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .tab-btn {
+            background-color: #e0e0e0;
+            border: none;
+            padding: 10px 15px;
+            margin: 0 5px;
+            cursor: pointer;
+            border-radius: 5px 5px 0 0;
+        }
+        
+        .tab-btn.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            border-radius: 50%;
+            animation: fall 5s linear forwards;
+        }
+        
+        @keyframes fall {
+            to {
+                transform: translateY(100vh);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>PEMANTAPAN DAN PERSIAPAN<br>ASESMEN STANDARDISASI PENDIDIKAN DAERAH</h1>
+            <div class="exam-info">
+                <div>Mata Pelajaran: Literasi Membaca - Bahasa Indonesia</div>
+                <div>Kelas: IX (Sembilan)</div>
+                <div>Waktu: 60 Menit</div>
+            </div>
+        </header>
+        
+        <div class="timer" id="timer">Waktu tersisa: 60:00</div>
+        
+        <div class="tab-buttons">
+            <button class="tab-btn active" onclick="openTab('soal')">Soal</button>
+            <button class="tab-btn" onclick="openTab('hasil')">Hasil</button>
+        </div>
+        
+        <div id="soal" class="tab active-tab">
+            <div class="progress-container">
+                <div id="progress-bar"></div>
+            </div>
+            
+            <form id="exam-form">
+                <!-- Soal 1 -->
+                <div class="question-container" id="q1">
+                    <div class="question-number">1. Cermatilah infografik berikut!</div>
+                    <div class="question-text">
+                        <p><strong>TIPS KULINER SEHAT</strong></p>
+                        <p>Pilih jenis makanan dan persi yang sehat untuk disantap<br>
+                        Perhatikan jumlah kalori yang dimakan<br>
+                        Pilih menu yang banyak mengandung sayuran atau bush<br>
+                        Jika Anda makan berlebihan, ingatlah selalu untuk membakar kalori dengan aktivitas fisik setelahnya<br>
+                        Hindari perut kosong sebelum kulinaran untuk menegah makan berlebihan</p>
+                        <p><strong>INGAT</strong><br>
+                        Kebutuhan maksimal orang per hari setara: Gula 4 sendok makan, Garam 1 sendok teh, Lemak 5 sendok makan (G4G1L5)</p>
+                        <p><strong>Permyataan</strong><br>
+                        1) Ada beberapa tips kuliner yang sehat, salah satunya memperhatikan jumlah kalori yang dimakan.<br>
+                        2) Jika anda makan berlebihan, ingatlah selalu untuk membakar vitamin dengan aktivitas fisik setelahnya.<br>
+                        3) Mennilih menu yang banyak mengandung sayuran atau buah adalah satu-satunya tips kuliner yang sehat.<br>
+                        4) Kebutuhan maksimal tubuh kita sehari setara dengan gula 4 sendok, garam 1 sendok teh, dan lemak 5 sendok makan.</p>
+                        <p>Pernyataan yang sesuai infografik tersebut terdapat pada nomor ....</p>
+                    </div>
+                    <div class="options">
+                        <label class="option"><input type="radio" name="q1" value="A"> A. 1 dan 2</label>
+                        <label class="option"><input type="radio" name="q1" value="B"> B. 2 dan 3</label>
+                        <label class="option"><input type="radio" name="q1" value="C"> C. 3 dan 4</label>
+                        <label class="option"><input type="radio" name="q1" value="D"> D. 1 dan 4</label>
+                    </div>
+                </div>
+                
+                <!-- Soal 2 -->
+                <div class="question-container" id="q2">
+                    <div class="question-number">2. Cermatilah teks berikut!</div>
+                    <div class="question-text">
+                        <p>Pada awal bulan Januari 2025, akhirnya Pemerintah Indonesia membatalkan rencana kenalkan tarif Pajak Pertambahan Nilai (PPN) yang rencananya secara umum dari 11% menjadi 12%. Keputusan ini diumumkan langsung oleh Presidente Prabowo Subianto menjelang pergantian tahun. Langkah ini diambil setelah mempertimbangkan berbagai masukan dari pelaku usaha, ekonom, serta masyarakat yang khawatir terhadap dampak kenalkan PPN terhadap harga barang dan jasa. Pembatalan ini menunjukkan kepekaan presiden terhadap kondisi perekonomian nasional, terutama dalam upaya pemulihan daya beli masyarakat dan tantangan yang dihadapi dunia usaha. Dengan pembatalan kenaikan ini, pemerintah berharap dapat menjaga stabilitas ekonomi dan mendorong pertumbuhan konsumsi dalam negeri. Kebijakan ini juga menjadi bagian dari strategi pemerintah dalam menjaga iklim investasi dan mendorong pemulihan ekonomi pascapandemi.</p>
+                        <p>Simpulan teks tersebut adalah ...</p>
+                    </div>
+                    <div class="options">
+                        <label class="option"><input type="radio" name="q2" value="A"> A. Pembatalan ini menunjukkan kepekaan presiden terhadap kondisi perekonomian nasional, terutama dalam upaya pemulihan daya beli masyarakat dan tantangan yang dihadapi dunia usaha.</label>
+                        <label class="option"><input type="radio" name="q2" value="B"> B. Pada awal bulan Januari 2025, akhirnya Pemerintah Indonesia membatalkan rencana kenalkan tarif pajak pertambahan nilai (PPN) yang rencananya secara umum dari 11% menjadi 12%.</label>
+                        <label class="option"><input type="radio" name="q2" value="C"> C. Pembatalan kenaikan tarif PPN menunjukkan kepekaan pemerintah terhadap kondisi ekonomi, daya beli masyarakat, dan strategi menjaga iklim invertasi serta pemulihan ekonomi.</label>
+                        <label class="option"><input type="radio" name="q2" value="D"> D. Pada awal Januari 2025, Pemerintah Indonesia membatalkan rencana kenaikan tarif Pajak Pertambahan Nilai (PPN) yang langsung diumumkan oleh Presidente Prabowo Subianto.</label>
+                    </div>
+                </div>
+                
+                <!-- Soal 3 -->
+                <div class="question-container" id="q3">
+                    <div class="question-number">3. Cermatilah teks berikut!</div>
+                    <div class="question-text">
+                        <p>(1)Curah hujan tinggi menyebabkan banjir di beberapa wilayah Jakarta dan membuat beberapa warga yang terdampak mengungsi. (2)Menurut data Badan Penanggulangan Bencana Daerah (BPBD), lebih dari 50 titik banjir terdeteksi dengan ketinggian air mencapai satu meter di beberapa daerah. (3)Banyak warga menilai bahwa sistem drainase yang buruk menjadi salah satu penyebab utama banjir yang terus berulang setiap tahun. (4)Pemerintah telah mengerahkan petugas dan bantuan logistik untuk membantu korban terdampak. (5)Sebagian masyarakat merasa respons yang diberikan masih kurang cepat.</p>
+                        <p>Kalimat opini dalam teks tersebut terdapat pada nomor ....</p>
+                    </div>
+                    <div class="options">
+                        <label class="option"><input type="radio" name="q3" value="A"> A. 4 dan 5</label>
+                        <label class="option"><input type="radio" name="q3" value="B"> B. 3 dan 5</label>
+                        <label class="option"><input type="radio" name="q3" value="C"> C. 1 dan 3</label>
+                        <label class="option"><input type="radio" name="q3" value="D"> D. 1 dan 2</label>
+                    </div>
+                </div>
+                
+            <!-- Soal 5 -->
+<div class="question-container" id="q5">
+    <div class="question-number">5. Cermatilah teks berikut!</div>
+    <div class="question-text">
+        <p>(1)Kemacetan di ibu kota semakin parah akibat meningkatnya jumlah kendaraan pribadi. (2)Kondisi lalu lintas di Jakarta lebih padat daripada kota-kota lain di Indonesia. (3) Banyak warga mengeluhkan waktu tempuh yang semakin lama saat berangkat dan pulang kerja. (4)Dibutuhkan solusi yang efektif untuk mengurangi kemacetan dan meningkatkan mobilitas masyarakatarkat. (5)Pemerintah berencana memperbanyak transportasi umum agar masyarakat beralih dari kendaraan pribadi.</p>
+        <p>Hubungan perbandingan dan tujuan terdapat pada kalimat nomor ….</p>
+    </div>
+    <div class="options">
+        <label class="option"><input type="radio" name="q5" value="A"> A. 1 dan 2</label>
+        <label class="option"><input type="radio" name="q5" value="B"> B. 1 dan 3</label>
+        <label class="option"><input type="radio" name="q5" value="C"> C. 2 dan 5</label>
+        <label class="option"><input type="radio" name="q5" value="D"> D. 4 dan 5</label>
+    </div>
+</div>
+
+<!-- Soal 6 -->
+<div class="question-container" id="q6">
+    <div class="question-number">6. Cermatilah teks berikut!</div>
+    <div class="question-text">
+        <p>Pada 15 November 2024, Timnas Indonesia menghadapi Jepang dalam lanjutan Kualifikasi Piala Dunia 2026 di Stadion Utama Gelora Bung Karno, Jakarta. Pertandingan ini menjadi tantangan berat bagi skuad Garuda, mengingat Jepang adalah pemuncak Grup C dengan catatan impresif. Meskipun bermain di hadapan pendukung sendiri, Indonesia harus mengakui keunggulan lawan setelah mengalami kekalahan dengan skor 4-0. Gol-gol Jepang dieetak oleh Takumi Minamino, Hidemasa Morita, Yukinari Sugawara, serta satu gol bunuh diri dari Justin Hubner. Kekalahan ini membuat posisi Indonesia semakin sulit di Grup C, dengan tetap berada di peringkat terbawah dan mengumpulkan tiga poin dari lima pertandingan. Sementara itu, Jepang semakin kokoh di punctak klasemen dengan 13 poin, unggul tujuh poin dari pesaing terdekarnya. <em>Timnas Indonesia perlu melakukan evaluasi menyeluruh dan meningkatkan performa untuk menghadapi laga-laga selanjutnya demi memperbaiki posisi di klasemen.</em> Di sisi lain, Pelatih Jepang, Hajime Moriyasu, menekankan pentingnya menjaga konsistensi timnya untuk memastikan tiket otomatis ke putaran final Piala Dunia 2026.</p>
+        <p>Makna kalimat bercetak miring dalam teks tersebut adalah ...</p>
+    </div>
+    <div class="options">
+        <label class="option"><input type="radio" name="q6" value="A"> A. Untuk memperbaiki peringkat di klasemen, Timnas Indonesia harus mengevaluasi secara mendalam dan meningkatkan kualitas permainan yang akan datang.</label>
+        <label class="option"><input type="radio" name="q6" value="B"> B. Timnas Indonesia harus belajar secara mendalam dan mempertahankan kualitas permainan mereka agar dapat tampil lebih baik di pertandingan berikutnya serta memperbaiki peringkat di klasemen.</label>
+        <label class="option"><input type="radio" name="q6" value="C"> C. Untuk mempertahankan peringkat di klasemen, Timnas Indonesia harus mengevaluasi secara mendalam dan meningkatkan kualitas permainan mereka agar dapat tampil lebih baik di pertandingan.</label>
+        <label class="option"><input type="radio" name="q6" value="D"> D. Timnas Indonesia harus berusaha secara mendalam dan meningkatkan kualitas permainan mereka agar dapat tampil lebih baik di pertandingan berikutnya serta mempertahankan peringkat di klasemen.</label>
+    </div>
+</div>
+
+<!-- Soal 7 -->
+<div class="question-container" id="q7">
+    <div class="question-number">7. Cermatilah teks berikut!</div>
+    <div class="question-text">
+        <p>Pemerintah Kota (Pemkot) Yogyakarta mulai menerapkan tindakan tegas terhadap pelanggaran Kawasan Tanga Rokok (KTR) di Jalan Malioboro pada 2025. Pelanggar aturan ini dapat dikenai sanksi berupa denda hingga Rp 7,5 juta atau hukuman kurungan penjara maksimal satu bulan, sebagaimana diatur dalam Peraturan Daerah (Perda) Kota Yogyakarta Nomor 2 Tahun 2017. Menurut Kasi Penyidikan Satpol PP Kota Yogyakarta, Ahmad Hidayat, langkah penegakan ini dilakukan setelah melihat tingginya jumlah pelanggaran sepanjang 2024, yang tercatat mencapai sekitar 4.000 kasus. Sebagian besar pelanggar merupakan wisatawan, sementara 5 persen lainnya adalah pelaku usaha wisata di kawasan Malioboro.</p>
+        <p>"Selama ini, kami fokus pada edukasi, pembinaan, dan penghalauan. Saat ditegur, mereka mematikan rokok dan membruangnya ke tempat sampah tanpa ada perlawanan," ujarnya, baru-baru ini. Ahmad menjelaskan, edukasi dan sosialisasi aturan KTR sebenarnya sudah berjalan sejak 2017. Namun, pada 2025, Pemkot Yogyakarta melalui Satpol PP akan mulai menerapkan sanksi yustisi, terutama kepada pelaku wisata yang merupakan warga Yogyakarta. "Penegakan hukum difokuskan pada pelaku usaha jasa partwisata di Malioboro yang dinilai sudah memahami aturan ini. Sanksi dapat berupa denda hingga Rp 7,5 juta atau kurungan maksimal satu bulan," jelasnya.</p>
+        <p>Tujuan penulisan teks tersebut adalah ...</p>
+    </div>
+    <div class="options">
+        <label class="option"><input type="radio" name="q7" value="A"> A. Mengajak para pelaku wisata dan wisatawan untuk mematuhi Peraturan Daerah Kota Yogyakarta Nomor 2 Tahun 2017, tentang Kawasan Tanga Rokok di Jalan Malioboro.</label>
+        <label class="option"><input type="radio" name="q7" value="B"> B. Menginformasikan tingginya jumlah pelanggaran terhadap Perda Kawasan Tampa Rokok di Jalan Malioboro sepanjang tahun 2023 sampai dengan 2024.</label>
+        <label class="option"><input type="radio" name="q7" value="C"> C. Menginformasikan bahwa Pemerintah Kota Yogyakarta akan mulai menerapkan sanksi yustisi pada pelanggar Perda Kota Yogyakarta Nomor 2 Tahun 2017 tentang Kawasan Tampa Rokok di Jalan Malioboro.</label>
+        <label class="option"><input type="radio" name="q7" value="D"> D. Mengimbau semua wisatawan untuk menegakkan aturan Kawasan Tampa Rokok di Jalan Malioboro dan menerapkan sanksi denda sekitar Rp7.000.000,00 bagi pelanggar.</label>
+    </div>
+</div>
+
+<!-- Soal 8 -->
+<div class="question-container" id="q8">
+    <div class="question-number">8. Bacalah kutipan teks berikut!</div>
+    <div class="question-text">
+        <p>"Belakangan Mak Saniah memang makin jarang datang. Aku dengan dia sudah sakit sakitan," kata Asyura.</p>
+        <p>"Tapi ya memang kasihan juga orang setua dia masih juga berjualan," Masdudin menimpali.</p>
+        <p>Asyura lalu bercerita tentang Mak Saniah lebih panjang. Cerita yang sebelumnya tak pernah dia dengan. Bahwa Mak Saniah adalah wanita dengan tujuh anak. Bahwa anak-anaknya pun sudah pada "jadi orang". Bahwa Mak Saniah memiliki tetap mendiami rumah sederhananya di kampung yang bertetangga dengan kampung tempat di mana Masdudin dan keluarganya tinggal. Bahwa Mak Saniah, setelah suaminya wafat belasan tahun lalu, memilih menghidupi dirinya dengan berjualan kue gemblong buatannya sendiri. Dengan begitulah dia bertahan hidup tanpa harus merepotkan anak-anak dan cucu-cucunya.</p>
+        <p>"Jadi, anak-anak Mak Saniah sebelumya sudah melarang dia berjualan. Tapi Mak Saniah tetap jualan," kata Asyura menutup cerita panjang lebarnya.</p>
+        <p>Masdudin juga tak pernah memiliki istrinya untuk mencari tahu bagaimana kabar Mak Saniah saat ini, tapi pada hari Minggu berikutnya keduanya sudah berada di depan rumah Mak Saniah setelah berusaha mencari dengan bertanya ke sana kemari. Dari bertanya itu pula keduanya tahu bahwa Mak Saniah kini memang sudah tak lagi bisa memaksakan diri untuk berjualan. Beragam penyakit berkumpul dan menyatu dalam tubuh rentanya.</p>
+        <p>Apa amanat yang tepat dari cerita tersebut?</p>
+    </div>
+    <div class="options">
+        <label class="option"><input type="radio" name="q8" value="A"> A. hendaklah tetap selalu berusaha mandiri</label>
+        <label class="option"><input type="radio" name="q8" value="B"> B. hargai segala perjuangan orang tua</label>
+        <label class="option"><input type="radio" name="q8" value="C"> C. beristirahatlah jika mulai sakit</label>
+        <label class="option"><input type="radio" name="q8" value="D"> D. tengoklah orang yang sedang sakit</label>
+    </div>
+</div>
+
+<!-- Soal 9 -->
+<div class="question-container" id="q9">
+    <div class="question-number">9. Bacalah kutipan teks berikut!</div>
+    <div class="question-text">
+        <p>(1) Dari pembaringan Mak Saniah menyambut kedatangan Masdudin dan Asyura setelah seorang cucunya, seorang gadis berusia 20-an tahun, mengantarkan mereka masuk ke kamar Mak Saniah. (2) Begitu masuk ke ruangan itu Masdudin dan Asyura membuat wewangkan asing tapi menyegarkan. Kamar itu, meskipun tidak terbilang bagus, tampak sangat terawat. Tak banyak benda-benda berserakan. Tempat Mak Saniah berbaring juga sangat bersih.</p>
+        <p>(3) "Ya Allah mimpi apa ya Mak semalam? Elu tahu rumah Mak, Neng?" sambut Mak Saniah. Masdudin melihat ada genangan air di kedua sudut mata Mak Saniah.</p>
+        <p>(4) "Ya, kita kan tetangga, Mak. Tetangga kampung. Nggak jauh. Cuma satu kali naik mobil angkutan." Mak Saniah tersenyum tipis. "Ya, memang nggak jauh ya, Neng. Makanya Mak pun kalau jualan sampai ke rumah Neng Syura ...."</p>
+        <p>(5) Tanpa diminta, gadis yang tadi mengantarkan Masdudin dan Asyura sudah menyuguhkan dua gelas teh panas dengan sekaleng biskuit.</p>
+        <p>(6) "Ayo, minum dulu dah, Neng. Makan tuh biskuitnya. Cuma itu yang ada. Mak sudah nggak sanggup bikin kue gemblong," ujar Mak Saniah begitu baki diletakkan di atas meja. Masdudin dan istrinya bertukar pandang dan berbagai senyum.</p>
+        <p>Bagian bermomor berapakah yang menunjukkan bahwa cucu Mak Saniah penuh kepedulian terhadap neneknya dan orang lain?</p>
+    </div>
+    <div class="options">
+        <label class="option"><input type="radio" name="q9" value="A"> A. (1) dan (2)</label>
+        <label class="option"><input type="radio" name="q9" value="B"> B. (1) dan (3)</label>
+        <label class="option"><input type="radio" name="q9" value="C"> C. (2) dan (3)</label>
+        <label class="option"><input type="radio" name="q9" value="D"> D. (2) dan (5)</label>
+    </div>
+</div>
+
+<!-- Soal 10 -->
+<div class="question-container" id="q10">
+    <div class="question-number">10. Bacalah kutipan teks berikut!</div>
+    <div class="question-text">
+        <p>Sinar mentari dari timur berusaha menerobos sela-sela gorden jendela yang berusaha melindungi Dinda dari teriknya yang cukup menyengat. Hari Minggu seperti ini memang waktu bagi Dinda untuk bersantai di rumah setelah hampir satu minggu berkutat dengan tugas-tugas sekolah yang seolah tiada habisnya.</p>
+        <p>Aktivitas yang tidak akan pernah absen dari jadwal santai Dinda di hari Minggu, yaitu membaca buku. Apalagi kemarin dirinya sempat meminjam buku romansa terbaru dari perpustakaan sekolah. Ketika dirinya akan mengambil sumber kebahagiaannya yang ada di dalam tasnya, tiba-tiba saja terdengar suara vokal dari wantta separuh baya yang seakan tidak bisa membuat hati Dinda tenang barang disumbang sedikit saja di hari liburnya ini.</p>
+        <p>"Din, kalau udah bangun, buruan turun, tolong bantuin ibu beli sayur ke pasar!" teriak ibunya dari lantai bawah. Meskipun enggan, Dinda tetap menuruti perintah ibunya dan meninggalkan buku roman yang sudah tidak sabar ingin segera dia nikmati itu. Namun, sepulangnya Dinda dari pasar, di depan rumahnya sudah tampak sosok sahabatnya, Tania, yang tampak tengah berduka jika melihat mimik wajahnya.</p>
+        <p>"Loh, Tan, kenapa mukamu tampak sedih begitu?" tanya Dinda khawatir.</p>
+        <p>"Din, gue baru aja putus sama Bimo..." jawab Tania sambil menitikkan air mata.</p>
+        <p>Dinda tidak habis plkir dengan reaksi Tania yang seolah-olah dunia sudah mau kiamat saja hanya karena putus cinta. Sebagai seseorang yang lebih nyaman dan aman bersama tumpukan buku, agenda untuk berpacaran memang tidak ada dalam daftar Dinda. Maka, ketika Tania menangis tersedu-sedu seperti saat ini, Dinda tak mampu merasa relate dengan apa yang dirasakan oleh sahabatnya itu. Melihat Tania yang seakan hancur lebur, Dinda pun mengajak Tania untuk masuk ke dalam rumahnya.</p>
+        <p>Penggambaran latar dan bukit yang sesuai dengan cerita tersebut adalah....</p>
+        <table border="1" cellpadding="5" cellspacing="0">
+            <tr>
+                <th>No.</th>
+                <th>Latar</th>
+                <th>Bukti</th>
+            </tr>
+            <tr>
+                <td>(1)</td>
+                <td>latar waktu pada pagi hari</td>
+                <td>Sinar mentari dari timur berusaha menerobos sela-sela gorden jendela yang berusaha melindungi Dinda dari teriknya yang cukup menyengat.</td>
+            </tr>
+            <tr>
+                <td>(2)</td>
+                <td>latar tempat di rumah Tania</td>
+                <td>Namun, sepulangnya Dinda dari pasar, di depan rumahnya sudah tampak sosok sahabatnya, Tania, yang tampak tengah berduka jika melihat mimik wajahnya.</td>
+            </tr>
+            <tr>
+                <td>(3)</td>
+                <td>latar suasana membingungkan</td>
+                <td>"Loh, Tan, kenapa mukamu tampak sedih begitu?" tanya Dinda. "Din, gue baru aja putus sama Bimo..." jawab Tania sambil menitikkan air mata</td>
+            </tr>
+            <tr>
+                <td>(4)</td>
+                <td>latar sosial dari ekonomi menengah</td>
+                <td>"Din, kalau udah bangun, buruan turun, tolong bantuin ibu beli sayur ke pasar!" teriak ibunya dari lantai bawah.</td>
+            </tr>
+        </table>
+        <p>Bukti latar yang paling sesuai dengan kutipan cerita tersebut adalah nomor ...</p>
+    </div>
+    <div class="options">
+        <label class="option"><input type="radio" name="q10" value="A"> A. (1) dan (2)</label>
+        <label class="option"><input type="radio" name="q10" value="B"> B. (1) dan (4)</label>
+        <label class="option"><input type="radio" name="q10" value="C"> C. (2) dan (4)</label>
+        <label class="option"><input type="radio" name="q10" value="D"> D. (3) dan (4)</label>
+    </div>
+</div>
+
+<!-- Soal 11 -->
+<div class="question-container" id="q11">
+    <div class="question-number">11. Bacalah kutipan teks berikut!</div>
+    <div class="question-text">
+        <p>Namun, sepulangnya Dinda dari pasar, di depan rumahnya sudah tampak sosok sahabatnya, Tania, yang tampak tengah berduka jika melihat mimik wajahnya. "Loh, Tan, kenapa mukamu tampak sedih begitu?" tanya Dinda khawatir. "Din, que baru aja putus sama Bimo..." jawab Tania sambil menitikkan air mata. Dinda tidak habis pikir dengan reaksi Tania yang seolah-olah dunia sudah mau kiamat saja hanya karena putus cinta. Sebagai seseorang yang lebih nyaman dan aman bersama tumpukan buku, agenda untuk berpacaran memang tidak ada dalam daftar Dinda.</p>
+        <p>Maka, ketika Tania menangis tersebut-sedu seperti saat ini, Dinda tak mampu merasa relate dengan apa yang dirasakan oleh sahabatnya itu. Melihat Tania yang seakan hancur lebur, Dinda pun mengajak Tania untuk masuk ke dalam rumahnya. Mau tidak mau Dinda kembali menunda menghabiskan waktu bersantainya bersama buku roman yang baru saja dia pinjam tersebut.</p>
+        <p>Kutipan teks tersebut termasuk bagian dari ...</p>
+    </div>
+    <div class="options">
+        <label class="option"><input type="radio" name="q11" value="A"> A. orientasi</label>
+        <label class="option"><input type="radio" name="q11" value="B"> B. komplikasi</label>
+        <label class="option"><input type="radio" name="q11" value="C"> C. resolusi</label>
+        <label class="option"><input type="radio" name="q11" value="D"> D. koda</label>
+    </div>
+</div>
+
+<!-- Soal 12 -->
+<div class="question-container" id="q12">
+    <div class="question-number">12. Bacalah kutipan teks berikut!</div>
+    <div class="question-text">
+        <p>"Belakangan Mak Saniah memang makin jarang datang. Aku dengan dia sudah sakit-sakitan," kata Asyura.</p>
+        <p>"Tapi, ya memang kasihan juga orang setua dia masih juga berjualan," Masdudin menimpali.</p>
+        <p>Asyura lalu bercerita tentang Mak Saniah lebih panjang. Cerita yang sebelumnya tak pernah dia dengan. Bahwa Mak Saniah adalah wanta dengan tujuh anak. Bahwa anak-anaknya pun sudah pada "jadi orang". Bahwa Mak Saniah memiliki tetap mendiami rumah sederhananya di kampung yang bertetangga dengan kampung tempat di mana Masdudin dan keluarganya tinggal. Bahwa Mak Saniah, setelah suaminya wafat belasan tahun lalu, memiliki menghidupi dirinya dengan berjualan kue gemblong buatannya sendiri. Dengan begitulah dia bertahan hidup tanpa harus merepotkan anak-anak dan cucu-cucunya.</p>
+        <p>"Jadi, anak-anak Mak Saniah sebelumya sudah melarang dia berjualan. Tapi Mak Saniah tetap jualan," kata Asyura mentutup cerita panjang lebarnya. Masdudin juga tak pernah meminta istrinya untuk mencari tahu bagaimana kabar Mak Saniah saat ini, tapi pada hari Minggu berikutnya keduanya sudah berada di depan rumah Mak Saniah setelah berusaha mencari dengan bertanya ke sana kemari. Dari bertanya itu pula keduanya tahu bahwa Mak Saniah kini memang sudah tak lagi bisa memaksakan diri untuk berjualan. Beragam penyakit berkumpul dan menyatu dalam tubuh rentanya.</p>
+        <p>Apa tema yang tepat dari cerita tersebut?</p>
+    </div>
+    <div class="options">
+        <label class="option"><input type="radio" name="q12" value="A"> A. kekerasan hati ibu untuk hidup mandiri</label>
+        <label class="option"><input type="radio" name="q12" value="B"> B. perjuangan ibu menghidupi keluarganya</label>
+        <label class="option"><input type="radio" name="q12" value="C"> C. kepedulian seorang ibu pada sesama</label>
+        <label class="option"><input type="radio" name="q12" value="D"> D. penyesalan ibu karena banyak penyakit</label>
+    </div>
+</div>
+
+<!-- Soal 13 -->
+<div class="question-container" id="q13">
+    <div class="question-number">13. Bacalah teks cerita berikut!</div>
+    <div class="question-text">
+        <p>Bila kehidupan adalah doa, maka lebih dari seperempat abad kehidupan seorang Nur Hidayati diisi dengan doa. Setiap aktivitas selalu dimulai dengan menyebut namaNya. Cahaya yang berlimpah petunjuk. Sesuai arti namamu memberi penerang bagi warga pesisir.</p>
+        <p>Aku masih ingat kala pertama bertemu denganmu. Ransel hitam, jeans, dan sneakers membungkus kakimu. Aku mengikuti aktivitasmu. Merekam, memotret, dan menulis tentangmu. Mulai dari menanam dan memantau bakau. Katamu, kepiting-kepiting itu butuh rumah supaya rajin bertelur. Dengan nada kelakar, kau bilang nelayan kita juga butuh duit biar cepat kaya. Penuh semangat, seorang Nur Hidayati memiudahan bibit bakau, mengganti tanaman yang mati, dan tersenyum puas memandang lautan lepas ke arah kapal nelayan pulang diantar angin pagi.</p>
+        <p>Tokoh aku menyampaikan penggambaran watak Nur Hidayati seorang yang peduli lingkungan melalui ….</p>
+    </div>
+    <div class="options">
+        <label class="option"><input type="radio" name="q13" value="A"> A. pikiran tokoh</label>
+        <label class="option"><input type="radio" name="q13" value="B"> B. perilaku tokoh</label>
+        <label class="option"><input type="radio" name="q13" value="C"> C. ciri fisik tokoh</label>
+        <label class="option"><input type="radio" name="q13" value="D"> D. secara langsung</label>
+    </div>
+</div>
+
+<!-- Soal 14 -->
+<div class="question-container" id="q14">
+    <div class="question-number">14. Bacalah teks cerita berikut!</div>
+    <div class="question-text">
+        <p>Bagi Riko, AI menjadi teman setia dalam mengerjakan tugas sekolah. Dengan hanya beberapa klik, jawaban pun datang. Hebatnya AI melebihi jin dalam kendi, pikir Riko. Riko dapat memperoleh jawaban yang tepat dan lengkap untuk setiap pertanyaan yang diajukan. Hemat waktu lagi. Benar-benar wow!</p>
+        <p>Namun, ketergantungan Riko pada AI mulai menimbulkan kekhawatiran. Guru-guru mulai memperhatikan jawaban-jawaban Riko terlalu sempurna dan tidak mencerminkan pemahaman yang sebenarnya. Mereka mulai curiga bahwa Riko telah mengandalkan AI terlalu banyak.</p>
+        <p>Hingga di suatu siang, Pak Beni memutuskan untuk menguji kemampuan Riko menyelesaian soal di papan tulis. Duh, Riko bingung sulit berkelit. Ia juga malu pada teman-teman yang mengira jago metematika.</p>
+        <p>"Bagaimana, Riko? Soal ini sama persis dengan PR kemarin," kata Pak Beni. Riko tak punya pilihan. Ia sampalkan dengan jujur bagaimana selama ini tugas-tugasnya bisa sempurna. Pak Beni pun tidak marah asalkan Riko berjanji tidak mengulangi dan lebih rajin belajar.</p>
+        <p>Riko tidak mampu mengerjakan soal matematika di papan tulis sehingga berakibat …</p>
+    </div>
+    <div class="options">
+        <label class="option"><input type="radio" name="q14" value="A"> A. Pak Beni meminta Riko mengerjakan soal kembali tanpa bantuan AI.</label>
+        <label class="option"><input type="radio" name="q14" value="B"> B. Riko berjanji untuk belajar lebih rajin dan tidak lagi mengandalkan AI.</label>
+        <label class="option"><input type="radio" name="q14" value="C"> C. Pak Beni marah pada Riko dan meminta untuk tidak menggunakan AI.</label>
+        <label class="option"><input type="radio" name="q14" value="D"> D. Riko mengakui ketidakjujuramnya dan berjanji tidak akan mengulangi.</label>
+    </div>
+</div>
+
+<!-- Soal 15 -->
+<div class="question-container" id="q15">
+    <div class="question-number">15. Bacalah teks berikut!</div>
+    <div class="question-text">
+        <p>Mode cepat atau fast fashion telah menjadi fenomena global dalam beberapa dekade terakhir. Industri fesyen yang bergerak cepat dan menghasilkan produk dalam jumlah besar telah menyebabkan peningkatan konsumsi dan produksi pakaian. Namun, dibalik kemudahan dan kenyamanan yang ditawarkan oleh fast fashion, terdapat dampak lingkungan yang signifikan. Salah satu dampak yang paling mencolok adalah peningkatan limbah yang dihasilkan oleh industri fesyen.</p>
+        <p>Limbah yang dihasilkan oleh industri fesyen tidak hanya berdampak pada lingkungan, tetapi juga berdampak pada kesehatan manusia. Limbah tekstil yang tidak diolah dengan baik dapat mencemari air dan tanah, serta menyebabkan peningkatan emisi gas rumah kaca. Untuk itu perlu dilakukan upaya guna mengurangi limbah yang dihasilkan oleh industri fesyen. Salah satu cara yang dapat dilakukan, yaitu dengan meningkatkan kesadaran konsumen tentang dampak lingkungan dari fast fashion, serta mengembangkan teknologi yang lebih ramah lingkungan untuk produksi pakaian.</p>
+        <p>Intisari yang dapat kamu temukan dari teks tersebut adalah …</p>
+    </div>
+    <div class="options">
+        <label class="option"><input type="radio" name="q15" value="A"> A. Mode cepat menjadi fenomena global dalam beberapa dekade terakhir karena menawaran kemudahan dan kenyamanan.</label>
+        <label class="option"><input type="radio" name="q15" value="B"> B. Limbah yang dihasilkan oleh industri fesyen memiliki banyak dampak bagi manusia sehingga dibutuhkan kesadaran konsumen.</label>
+        <label class="option"><input type="radio" name="q15" value="C"> C. Fast fashion menjadi fenomena global beberapa dekade terakhir karena limbah yang dihasilkan berpengaruh pada lingkungan dan kesehatan manusia.</label>
+        <label class="option"><input type="radio" name="q15" value="D"> D. Mode cepat menyebabkan peningkatan konsumsi pakaian global sehingga perlu upaya untuk mengurangi limbah yang dihasilkan oleh industri fesyen.</label>
+    </div>
+</div>
+
+<!-- Soal 16 -->
+<div class="question-container" id="q16">
+    <div class="question-number">16. Bacalah teks berikut!</div>
+    <div class="question-text">
+        <p>Aku lahir dan dibesarkan di tanah leluhurku, di hutan hujan yang lebat dan hijau. Aku adalah bagian dari masyarakat adat yang telah hidup di sini selama berabad-abad. Kami memiliki tradisi dan kepercayaan yang kuat tentang pentingnya menjaga keseimbangan alam. Kau boleh memanggilku Orang Ulu atau Orang Rimba. Sebagian memanggilku anak alam. Jika kau berjumpa denganku, tak perlu ulurkan roti atau cokelat. Jangan pula memberikan alas kaki.</p>
+        <p>Saat ini tanah leluhurku merah membara. Perusahaan-perusahaan besar mulai mengganyang hutan kami. Mereka datang memberi gula-gula lalu merampas tanah, air, dan darah. Menyisakan jejak air mata di pipi saudara-saudara kami. Mereka menebang pohon-pohon kami, menggali tanah kami, dan mencemari sungai kami. Mengganti semua itu dengan nama perubahan dan kemajuan.</p>
+        <p>Panas semakin terasa di tanah leluhur kami. Orang-orang pintar menyebutnya perubahan iklim. Aku dan saudara-saudaraku hanya melihat hutan kami semakin menipis, dan hewan-hewan semakin jarang ditemui. Kami harus berjuang untuk bertahan hidup, tapi kami tidak tahu berapa lama lagi bisa bertahan.</p>
+        <p>Alam memiliki kekuatan yang luar biasa dan kami harus menjaga untuk memastikan kehidupan tetap berjalan semestinya. Di kejauhan kudengar suara memekakkan telinga. Sebuah alat berat mulai menghancuran sedikit demi sedikit hutan kami. Panas semakin menggigit kulit. Aku dan leluhurku semakin lenyap ditelan suara buldoser.</p>
+        <p>Setelah membaca cerpen tersebut, sinopsis yang paling tepat menurutmu adalah …</p>
+    </div>
+    <div class="options">
+        <label class="option"><input type="radio" name="q16" value="A"> A. Tokoh aku bagian dari masyarakat rimba yang hidup di hutan. Ia dan warganya selalu menjaga alam. Namun, kehidupannya terancam oleh perusak hutan. Ia berjuang untuk menjaga kelestarian alam di tengah perubahan iklim yang semakin parah.</label>
+        <label class="option"><input type="radio" name="q16" value="B"> B. Tokoh aku seorang anak yang hidup di hutan rimba. Ia bertugas menjaga alam dari kerusakan. Orang-orang yang menemuinya sering membagikan roti dan cokelat karena tokoh aku kelaparan. Hal itu disebabkan karena kerusakan iklim yang parah.</label>
+        <label class="option"><input type="radio" name="q16" value="C"> C. Tokoh aku dibesarkan di hutan hujan pedalaman yang kekurangan makanan karena krisis iklim yang disebabkan ulah perusahaan besar. Perusahan tersebut ingin menguasai hutan. Tokoh aku mencegah dengan menghentikan buldoser yang beroperasi.</label>
+        <label class="option"><input type="radio" name="q16" value="D"> D. Tokoh aku seorang anak rimba yang senang mengembara di hutan. Suatu hari ia bertemu dengan pinak-pihak yang akan merambah hutan. Tokoh aku melakukan dan tertangkap. Sejak saat itu tidak ada lagi yang mendengar kabar tentang tokoh aku.</label>
+    </div>
+</div>
+
+<!-- Soal 17 -->
+<div class="question-container" id="q17">
+    <div class="question-number">17. Cermatilah teks cerpen dan pernyataan berikut!</div>
+    <div class="question-text">
+        <p><strong>Teks Cerpen</strong></p>
+        <p>Aku lahir dan dibesarkan di tanah leluhurku, di hutan hujan yang lebat dan hijau. Aku adalah bagian dari masyarakat adat yang telah hidup di sini selama berabad-abad. Kami memiliki tradisi dan kepercayaan yang kuat tentang pentingnya menjaga keseimbangan alam. Kau boleh memanggilku Orang Ulu atau Orang Rimba. Sebagian memanggilku anak alam. Jika kau berjumpa denganku, tak perlu ulurkan roti atau cokelat. Jangan pula memberikan alas kaki.</p>
+        <p>Saat ini tanah leluhurku merah membara. Perusahaan-perusahaan besar mulai mengganyang hutan kami. Mereka datang memberi gula-gula lalu merampas tanah, air, dan darah. Menyisakan jejak air mata di pipi saudara-saudara kami. Mereka menebang pohon-pohon kami, menggali tanah kami, dan mencemari sungai kami. Mengganti semua itu dengan nama pertubahan dan kemajuan.</p>
+        <p>Panas semakin terasa di tanah leluhur kami. Orang-orang pintar menyebutnya pertubahan iklim. Aku dan saudara-saudaraku hanya melihat hutan kami semakin menipis, dan hewan-hewan semakin jarang ditemui. Kami harus berjuang untuk bertahan hidup, tapi kami tidak tahu berapa lama lagi bisa bertahan.</p>
+        <p>Alam memiliki kekuatan yang luar blasa dan kami harus menjaga untuk memastikan kehidupan tetap berjalan semestinya. Di kejauhan kudengar suara memekakkan telinga. sebuah alat berat mulai menghancuran sedikit demi sedikit hutan kami. Panas semakin menggigit kulit. Aku dan leluhurku semakin lenyap ditelan suara buldoser.</p>
+        <p><strong>Pernyataan</strong></p>
+        <p>1. Pesan yang disampaikan menggunakan pembaca untuk melestarikan alam.<br>
+        2. Penulis berada di luar cerita untuk menunjukkan keserbatahuan.<br>
+        3. Latar hutan membuatikan bahwa hutan lindung masih terjaga.<br>
+        4. Tokoh aku mewakili karakter peduli dan pejuang lingkungan.</p>
+        <p>Selain sebagai hiburan, cerita tersebut memberikan kesadaran bagi pembaca. Pendapat yang menguatkan terkait hal tersebut terdapat pada pernyataan ….</p>
+    </div>
+    <div class="options">
+        <label class="option"><input type="radio" name="q17" value="A"> A. 1 dan 3</label>
+        <label class="option"><input type="radio" name="q17" value="B"> B. 1 dan 4</label>
+        <label class="option"><input type="radio" name="q17" value="C"> C. 2 dan 3</label>
+        <label class="option"><input type="radio" name="q17" value="D"> D. 2 dan 4</label>
+    </div>
+</div>
+
+<!-- Soal 18 -->
+<div class="question-container" id="q18">
+    <div class="question-number">18. Cermatilah infografik berikut!</div>
+    <div class="question-text">
+        <p><strong>Pernyataan</strong></p>
+        <p>1. Media sosial memberikan efek samping negatif bagi anak-anak sehingga harus ada aturan pembatasan yang tegas.<br>
+        2. Indonesia harus mengikuti langkah beberapa negara maju dalam menerapkan aturan pembatasan usia bermedia sosial.<br>
+        3. Konten pornografi anak di Indonesia merupakan yang tertinggi di dunia sehingga penggunaan HP sangat berbahaya.<br>
+        4. Langkah Kementerian Komdigi menggodok aturan usia bermedia sosial merupakan upaya penyelamatan anak dari kecanduan bermain gim.</p>
+        <p>Kebijakan membatasi anak-anak bermain media sosial merupakan keputusan yang tepat. Pernyataan yang mendukung hal tersebut jika dikaitkan dengan isi infografis terdapat pada pernyataan nomor ….</p>
+    </div>
+    <div class="options">
+        <label class="option"><input type="radio" name="q18" value="A"> A. 1 dan 2</label>
+        <label class="option"><input type="radio" name="q18" value="B"> B. 1 dan 3</label>
+        <label class="option"><input type="radio" name="q18" value="C"> C. 4 dan 3</label>
+        <label class="option"><input type="radio" name="q18" value="D"> D. 4 dan 2</label>
+    </div>
+</div>
+
+<!-- Soal 19 -->
+<div class="question-container" id="q19">
+    <div class="question-number">19. Cermati poster berikut!</div>
+    <div class="question-text">
+        <div style="background-color: #ffeb3b; padding: 15px; border-radius: 5px; text-align: center; margin: 10px 0;">
+            <h2 style="color: #f44336; margin: 0;">A W A S ! B A H A Y A H P</h2>
+            <p style="font-size: 16px;">HP bisa ganggu fokus belajar, rusak mata, dan bikin kamu susah bersosialisasi.</p>
+            <p style="font-weight: bold;">Gunakan dengan Bijak</p>
+        </div>
+        <p>Berikut alternatif solusi yang bisa dilakukan oleh pihak sekolah untuk mengatasi permasalahan tersebut.</p>
+        <p>(1) Sekolah dan orang tua bekerja sama mementukan batasan waktu yang jelas terkait penggunaan HP pada siswa.<br>
+        (2) Sekolah melarang siswa membawa HP ke sekolah dengan sanksi yang tegas bagi yang melanggar.<br>
+        (3) Sekolah menyediakan kegiatan alternatif menarik bagi siswa seperti, ekstrakurikuler, olahraga, atau sosial.<br>
+        (4) Orang tua siswa diminta untuk tidak memberikan fasilitas HP kepada anak-anaknya yang masih bersekolah.</p>
+        <p>Dua solusi terbaik untuk mengurangi dampak negatif permasalahan tersebut terdapat pada nomor ….</p>
+    </div>
+    <div class="options">
+        <label class="option"><input type="radio" name="q19" value="A"> A. (1) dan (2)</label>
+        <label class="option"><input type="radio" name="q19" value="B"> B. (1) dan (3)</label>
+        <label class="option"><input type="radio" name="q19" value="C"> C. (2) dan (3)</label>
+        <label class="option"><input type="radio" name="q19" value="D"> D. (2) dan (4)</label>
+    </div>
+</div>
+
+<!-- Soal 20 -->
+<div class="question-container" id="q20">
+    <div class="question-number">20. Bacalah kedua teks deskripsi berikut!</div>
+    <div class="question-text">
+        <p><strong>Teks 1</strong></p>
+        <p>Desa Sukamaju, yang terletak di lereng gunung, tiba-tiba dilanda banjir bandang. Hujan deras yang mengguyur selama berhari-hari menyebabkan sungai yang melintasi desa meluap. Air bah dengan cepat menghancurkan rumah-rumah warga, menyeret pepohonan dan batu-batu besar. Suara gemuruh air bereampur terlakan panik warga menoiptakan suasana yang mencekam. Dalam hitungan jam, desa Sukamaju berubah menjadi lautan lumpur dan puing-puing. Banyak warga kehilangan tempat tinggal dan harta benda mereka. Banjir bandang ini disebabkan oleh kombinasi faktor alam dan manusia. Hujan lebat merupakan pemicu utama, namun, kerusakan hutan di hulu sungai akibat penebangan liar juga memperparah situasi.</p>
+        <p><strong>Teks 2</strong></p>
+        <p>Jakarta, ibu kota Indonesia, kembali dilanda banjir. Kali ini yang menjadi penyebabnya adalah buruknya sistem drainase kota. Sampah yang menumpuk di saluran air menghalangi aliran air, menyebabkan air meluap dan membanjiri jalan-jalan dan pemukiman warga. Banjir di Jakarta tidak hanya merusak rumah dan harta benda, tetapi juga melumpuhkan aktivitas ekonomi dan transportasi. Kemacetan parah terjadi di mana-mana, dan banyak orang yang terjebak banjir. Banjir di Jakarta merupakan masalah kompleks yang disebabkan oleh kombinasi faktor, termasuk curah hujan tinggi, buruknya drainase, dan tata ruang kota yang tidak teratur.</p>
+        <p>Hal pokok apa yang membedakan isi kedua teks tersebut?</p>
+    </div>
+    <div class="options">
+        <label class="option"><input type="radio" name="q20" value="A"> A. penyebab banjir</label>
+        <label class="option"><input type="radio" name="q20" value="B"> B. kondisi pascabanjir</label>
+        <label class="option"><input type="radio" name="q20" value="C"> C. peristiwa yang terjadi</label>
+        <label class="option"><input type="radio" name="q20" value="D"> D. penanganan korban</label>
+    </div>
+</div>
+
+<!-- Soal 21 -->
+<div class="question-container" id="q21">
+    <div class="question-number">21. Perhatijan pulsi berikut!</div>
+    <div class="question-text">
+        <table border="1" cellpadding="5" cellspacing="0" width="100%">
+            <tr>
+                <th width="50%">Puisi 1</th>
+                <th width="50%">Puisi 2</th>
+            </tr>
+            <tr>
+                <td>
+                    <p>Damai<br>
+                    Hening malam membelai lembut,<br>
+                    Membawa kedamaian yang terengkuh.<br>
+                    Cahaya bulan bersinar terang,<br>
+                    Menyembuhkan luka yang menganga.<br>
+                    Suara alam berbisik lembut,<br>
+                    Mengundang kita untuk merenung.<br>
+                    Burung-burung bernyanyi riang,<br>
+                    Menyambut datangnya pagi yang cerah.</p>
+                </td>
+                <td>
+                    <p>Perjuangan<br>
+                    Hidup adalah sebuah perjuangan,<br>
+                    Penuh dengan rintangan dan cobaan.<br>
+                    Seperti gunung yang menjulang tinggi,<br>
+                    Hidup penuh rintangan yang harus ditaklukkan.<br>
+                    Seperti sungai yang mengalir deras,<br>
+                    Hidup akan terus berjalan.<br>
+                    Seperti laut yang mengalun ombak,<br>
+                    Hidup penuh dengan pasang surut.<br>
+                    Tak ada pilihan kecuali maju berjuang</p>
+                </td>
+            </tr>
+        </table>
+        <p>Perbedaan penggunaan majas yang dominan dalam kedua pulsi tersebut adalah …</p>
+    </div>
+    <div class="options">
+        <label class="option"><input type="radio" name="q21" value="A"> A. simile - metafora</label>
+        <label class="option"><input type="radio" name="q21" value="B"> B. personifikasi - simile</label>
+        <label class="option"><input type="radio" name="q21" value="C"> C. hiperbola - personifikasi</label>
+        <label class="option"><input type="radio" name="q21" value="D"> D. metafora - hiperbola</label>
+    </div>
+</div>
+
+<!-- Soal 22 -->
+<div class="question-container" id="q22">
+    <div class="question-number">22. Bacalah teks berikut!</div>
+    <div class="question-text">
+        <p><strong>Remaja dan Tekanan Teman Sebaya</strong></p>
+        <p>Salah satu problematis utama yang dihadapi remaja adalah tekanan dari teman temannya. Mereka ingin diterima dan disukai oleh teman-teman di komunitasnya. Akibatnya, remaja mungkin merasa harus menuruti gaya atau perilaku yang sedang populer, meskipun sebenarnya tidak sesuai dengan nilai-nilai yang mereka yakini. Hal ini disebut sebagai konformitas.</p>
+        <p>Namun, jika terlalu mengikuti teman, remaja bisa jadi tidak fokus mengembangkan potensialnya. Mereka mungkin kehilangan kesempatan untuk mencari tahu apa yang mereka sukai dan kuasai karena terlalu sibuk beradaptasi dengan orang lain. Oleh karena itu, penting bagi remaja untuk belajar menyetarakan antara keinginan untuk diterima oleh teman-teman dan kebutuhan untuk menjadi diri sendiri.</p>
+        <p>Berikut alternatif perbaikan penggunaan istilah dalam teks tersebut.</p>
+        <p>(1) Istilah 'problematis' diganti dengan 'problem'<br>
+        (2) Istilah 'komunitas' diganti dengan 'komuniti'<br>
+        (3) Istilah ' problematis' diganti dengan 'problema'<br>
+        (4) Istilah 'potensial' diganti dengan 'potensi'</p>
+        <p>Perbaikan penggunaan istilah yang tepat sesuai teks tersebut adalah ….</p>
+    </div>
+    <div class="options">
+        <label class="option"><input type="radio" name="q22" value="A"> A. (1) dan (3)</label>
+        <label class="option"><input type="radio" name="q22" value="B"> B. (1) dan (4)</label>
+        <label class="option"><input type="radio" name="q22" value="C"> C. (2) dan (3)</label>
+        <label class="option"><input type="radio" name="q22" value="D"> D. (2) dan (4)</label>
+    </div>
+</div>
+
+<!-- Soal 23 -->
+<div class="question-container" id="q23">
+    <div class="question-number">23. Bacalah teks berikut!</div>
+    <div class="question-text">
+        <p>Bu Rini, mamanya Karin, ingin mengembangkan bisnisnya. Sebelumya dia telah memiliki usaha toko baju di samping rumahnya. Setiap pembeli harus datang ke tokonya apabila ingin berbelanja. Bu Rini ingin berjualan secara daring yang diharapkan dapat miningkatkan omzet. Karin diminta membantu ibunya membuatkan iklan untuk mempromosikan usaha ibunya.</p>
+        <p>Iklan yang sesuai dengan kebutuhan Karin adalah iklan bernomor….</p>
+        <table border="1" cellpadding="5" cellspacing="0" width="100%">
+            <tr>
+                <td width="50%">
+                    <div style="border: 1px solid #ddd; padding: 10px; margin: 5px; text-align: center;">
+                        <p style="font-weight: bold; font-size: 18px;">KARIN'S FASHION</p>
+                        <p>Harga Murah Kualitas Mewah</p>
+                        <p>OPERING</p>
+                        <p>Dapatkan promo menarik dengan follow @KARIN'SSTORE</p>
+                        <p>MINGGU 2 APRIL 2025</p>
+                        <p>ADI SUCIPTO 12A, JOGJAKARTA</p>
+                    </div>
+                </td>
+                <td width="50%">
+                    <div style="border: 1px solid #ddd; padding: 10px; margin: 5px; text-align: center;">
+                        <p style="font-weight: bold; font-size: 18px;">KARIN'S KIDS STORE</p>
+                        <p>Online</p>
+                        <p>Dukangara Kesdi untuk Namaji Basar Mervika</p>
+                        <p>KARIN'SKIDSSTORE</p>
+                        <p>Whatsapp +62876543210</p>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="options">
+        <label class="option"><input type="radio" name="q23" value="A"> A</label>
+        <label class="option"><input type="radio" name="q23" value="B"> B</label>
+        <label class="option"><input type="radio" name="q23" value="C"> C</label>
+        <label class="option"><input type="radio" name="q23" value="D"> D</label>
+    </div>
+</div>
+
+<!-- Soal 24 -->
+<div class="question-container" id="q24">
+    <div class="question-number">24. Bacalah kedua teks deskripsi berikut!</div>
+    <div class="question-text">
+        <p><strong>Teks 1</strong></p>
+        <p>Desa Sukamaju, yang terletak di lereng gunung, tiba-tiba dilanda banjir bandang. Hujan deras yang mengguyur selama berhari-hari menyebabkan sungai yang melintasi desa meluap. Air bah dengan cepat menghancurkan rumah-rumah warga, menyeret pepohonan dan batu-batu besar. Suara gemuruh air bereampur terlakan panik warga menoiptakan suasana yang mencekam. Dalam hitungan jam, desa Sukamaju berubah menjadi lautan lumpur dan puing-puing. Banyak warga kehilangan tempat tinggal dan harta benda mereka. Banjir bandang ini disebabkan oleh kombinasi faktor alam dan manusia. Hujan lebat merupakan pemicu utama, namun, kerusakan hutan di hulu sungai akibat penebangan liar juga memperparah situasi.</p>
+        <p><strong>Teks 2</strong></p>
+        <p>Jakarta, ibu kota Indonesia, kembali dilanda banjir. Kali ini yang menjadi penyebabnya adalah buruknya sistem drainase kota. Sampah yang menumpuk di saluran air menghalangi aliran air, menyebabkan air meluap dan membanjiri jalan-jalan dan pemukiman warga. Banjir di Jakarta tidak hanya merusak rumah dan harta benda, tetapi juga melumpuhkan aktivitas ekonomi dan transportasi. Kemacetan parah terjadi di mana-mana, dan banyak orang yang terjebak banjir. Banjir di Jakarta merupakan masalah kompleks yang disebabkan oleh kombinasi faktor, termasuk curah hujan tinggi, buruknya drainase, dan tata ruang kota yang tidak teratur.</p>
+        <p>Hal pokok apa yang membedakan isi kedua teks tersebut?</p>
+    </div>
+    <div class="options">
+        <label class="option"><input type="radio" name="q24" value="A"> A. penyebab banjir</label>
+        <label class="option"><input type="radio" name="q24" value="B"> B. kondisi pascabanjir</label>
+        <label class="option"><input type="radio" name="q24" value="C"> C. peristiwa yang terjadi</label>
+        <label class="option"><input type="radio" name="q24" value="D"> D. penanganan korban</label>
+    </div>
+</div>
+
+                <!-- Soal 25 -->
+                <div class="question-container" id="q25">
+                    <div class="question-number">25. Cermatilah teks rumpang berikut!</div>
+                    <div class="question-text">
+                        <p>Kebiasaan mengonsumsi makanan manis-manis yang berlebihan dapat memicu naiknya kadar gula darah dalam tubuh. Seseorang yang memiliki kadar gula darah di atas batas normal, tetapi belum sampai pada kriteria diabetes disebut dalam kondisi prediabetes. Apabila kondisi prediabetes tidak segera ditangani, risiko menjadi diabetes sangat tinggi. Diabetes merupakan penyakit yang berjalan dalam senyap. [...] Gejala yang muncul, seperti sering kencing pada malam hari, berat badan turun, sering merasa lapar meskipun sudah banyak makan, sering tidak disadari sebagai gejala diabetes. Sering seseorang baru mengetahui dirinya terkena diabetes ketika merasa menderita suatu penyakit yang muncul secara mendadak atau tidak sembuh-sembuh dan dicek kadar gula darahnya. Padahal, kalau sudah mengalami diabetes, itu tidak bisa disembuhkan. Hingga saat ini belum ada pengobatan yang dapat membuat seseorang yang sudah berada apada fase diabetes bisa sembuh. Namun, jika diketahui pada fase prediabetes, itu bisa dikelola dan dikembalikan ke kondisi normal.</p>
+                        <p>Bagian rumpang pada teks tersebut paling tepat dilengkapi dengan argument ...</p>
+                    </div>
+                    <div class="options">
+                        <label class="option"><input type="radio" name="q25" value="A"> A. Gejala tertentu yang muncul akibat meningkatnya kadar gula darah sering tidak diperhatikan.</label>
+                        <label class="option"><input type="radio" name="q25" value="B"> B. Meskipun gula darah sudah meningkat, seseorang awalnya tidak merasakan gejala tertentu.</label>
+                        <label class="option"><input type="radio" name="q25" value="C"> C. Meningkatnya kadar gula darah dalam tubuh sering diabalkan karena dianggap hal yang wajar.</label>
+                        <label class="option"><input type="radio" name="q25" value="D"> D. Ketika tubuh terasa baik-baik saja, mengecek kadar gula darah tidak menjadi prioritas.</label>
+                    </div>
+                </div>
+
+                <!-- Soal 26 -->
+                <div class="question-container" id="q26">
+                    <div class="question-number">26. Cermatilah ilustrasi berikut!</div>
+                    <div class="question-text">
+                        <div style="border: 1px solid #ddd; padding: 15px; text-align: center;">
+                            <p>Sebuah panti sosial menawarkan keset kaki berbahan kain perca yang dibuat oleh warga panti. Menurut pihak panti, harga keset tersebut sangat terjangkau karena bahannya dari kain perca limbah pabrik konveksi. Keset tersebut berkualitas baik. Dengan membeli keset tersebut, secara tidak langsung berarti sudah berkontribusi dalam menyelamatkan lingkungan dari pencemaran limbah kain.</p>
+                            <p>[...]</p>
+                        </div>
+                        <p>Dengan memperhatikan penjelasan tentang keset kaki, kalimat iklan bermajas yang paling sesuai untuk melengkapi gambar tersebut adalah ...</p>
+                    </div>
+                    <div class="options">
+                        <label class="option"><input type="radio" name="q26" value="A"> A. Harga murah, kualitas wah. Kami persembahkan keset kaki dari kain perca untuk Anda.</label>
+                        <label class="option"><input type="radio" name="q26" value="B"> B. Dapatkan harga murah untuk keset kaki berkualitas. Hidup Anda makin berguna bagi sesama.</label>
+                        <label class="option"><input type="radio" name="q26" value="C"> C. Wujudkan lingkungan yang sehat dengan membeli keset kain perca mewah, harga murah.</label>
+                        <label class="option"><input type="radio" name="q26" value="D"> D. Keset kaki berkualitas dari kain perca. Harga ramah di kantong, ramah lingkungan.</label>
+                    </div>
+                </div>
+
+                <!-- Soal 27 -->
+                <div class="question-container" id="q27">
+                    <div class="question-number">27. Cermatilah teks berikut!</div>
+                    <div class="question-text">
+                        <p>(1) Cedera kepala bisa terjadi di dalam sepak bola. Apakah cedera tersebut terjadi akibat benturan antara kepala dengan bola saat penyundulan bola? (2) Ada beberapa kajian yang meneltii adanya cedera pada pemain sepak bola kompetisi dan tidak menemukan kaitan antara penyundulan bola dengan cedera otak. (3) Akselerasi kepala yang ditimbulkan oleh penyundulan bola diang gap tidak terlalu besar untuk menyebabkan gegar otak. (4) Cedera otak seperti itu merupakan hal yang biasa dan banyak pemain sepak bola mengalaminya. (5) Cedera kepala serius pada pemain sepak bola lebih disebabkan oleh benturan kepala dengan kepala atau benturan antara kepala dengan kaki. (6) Ada yang menasihatkan pemain bola untuk mengenakan helm lunak, tetapi ini belum terbukti mengurangi risiko cedera serius.</p>
+                        <p>Agar teks menjadi kohesi dan koheren, kalimat yang harus dihilangkan adalah nomor ...</p>
+                    </div>
+                    <div class="options">
+                        <label class="option"><input type="radio" name="q27" value="A"> A. (2)</label>
+                        <label class="option"><input type="radio" name="q27" value="B"> B. (3)</label>
+                        <label class="option"><input type="radio" name="q27" value="C"> C. (4)</label>
+                        <label class="option"><input type="radio" name="q27" value="D"> D. (5)</label>
+                    </div>
+                </div>
+
+                <!-- Soal 28 -->
+                <div class="question-container" id="q28">
+                    <div class="question-number">28. Cermatilah ilustrasi dan kalimat poster berikut!</div>
+                    <div class="question-text">
+                        <p><strong>Ilustrasi</strong></p>
+                        <p>Banyak cara diupayakan oleh pemerintah dalam rangka meningkatkan ketahanan pangan masyarakat. Salah satunya adalah mendorong masyarakat untuk memberdayakan tanah pekarangan sebagai dapat hidup. Masyarakat didorong untuk menanam tanaman yang dapat dimanfaatkan untuk memenuhi kebutuhan dapat mereka. Tanaman seperti sawi, pakcoy, kangkung, cabai, terong, loncang, sledri, dan lain-lain tetap bisa dibudidayakan meskipun luas pekarangan terbatas. Mereka hanya perlu menyesuaikan tempat dan media tanam yang sesuai. Dapur hidup dapat memperingan beban ekonomi keluarga karena sebagaiakebutuhan dapat bisa dipenuhi sendiri tanpa harus membeli. Kesehatan tanaman dapat hidup lebih terjamin. Dapur hidup juga membuat lingkungan lebih asri.</p>
+                        <p><strong>Kalimat Poster</strong></p>
+                        <p>(1) Walaupun tempat terbatas, kreativitas tetap tanpa batas.<br>
+                        (2) Bertanam di pekarangan, lingkungan jadi lebih aman.<br>
+                        (3) Berkebun di rumah mudah, manfaatnya berlimpah.<br>
+                        (4) Manfaatkan pekarangan untuk hal-hal yang menyehatkan.<br>
+                        (5) Tanam sayuran di lingkungan. Menjaga kesehatan dan penghematan.</p>
+                        <p>Agar masyarakat tergerak untuk memberdayakan tanah pekarangan sebagai dapat hidup, kalimat poster yang paling tepat untuk dipasang adalah nomor ….</p>
+                    </div>
+                    <div class="options">
+                        <label class="option"><input type="radio" name="q28" value="A"> A. (1) dan (3)</label>
+                        <label class="option"><input type="radio" name="q28" value="B"> B. (2) dab (4)</label>
+                        <label class="option"><input type="radio" name="q28" value="C"> C. (3) dan (5)</label>
+                        <label class="option"><input type="radio" name="q28" value="D"> D. (4) dan (5)</label>
+                    </div>
+                </div>
+
+                <!-- Soal 29 -->
+                <div class="question-container" id="q29">
+                    <div class="question-number">29. Cermatilah tabel berikut!</div>
+                    <div class="question-text">
+                        <table border="1" cellpadding="5" cellspacing="0" width="100%">
+                            <tr>
+                                <th>Kandungan Tomat</th>
+                                <th>Manfaat</th>
+                                <th>Dampak</th>
+                            </tr>
+                            <tr>
+                                <td>asam p-kumarat dan asam klorogenat</td>
+                                <td>melemahkan kanker terutama kanker rongga mulut, tenggorokan, lambung, usus besar, dan prostat</td>
+                                <td>terhindar dari batu empedu</td>
+                            </tr>
+                            <tr>
+                                <td>asam malat dan asam sitrat</td>
+                                <td>membersihkan saluran empedu</td>
+                                <td>terhindar dari batu empedu</td>
+                            </tr>
+                            <tr>
+                                <td>pigmen likopen</td>
+                                <td>• antibksidan yang melumpuhkan radikal bebas yang merusak sel-sel<br>• menyeimbangkan kadar kolesterol darah dan tekanan darah<br>• melenturkan kembali sel-sel jantung yang kaku akibat endapan kolesterol dan gula darah</td>
+                                <td>• kulit kencang dan lembut<br>• terhindar dari hipertensi<br>• jantung lebih sehat</td>
+                            </tr>
+                            <tr>
+                                <td>zat tomatin</td>
+                                <td>• antiinflamasi<br>• antipiretik</td>
+                                <td>• menyembuhkan radang jerawat, luka, borok, wasir, usus buntu, dan saluran pernapasan<br>• menurunkan demam</td>
+                            </tr>
+                        </table>
+                        <p>Teks yang sesuai dengan tabel tersebut adalah ....</p>
+                    </div>
+                    <div class="options">
+                        <label class="option"><input type="radio" name="q29" value="A"> A. Siapa yang tak mengenal tomat? Jika dikonsumsi secara rutin, kita bisa memperoleh banyak manfaat darinya karena kandungan gizinya yang beragam. Asam p-kumarat dan asam klorogenat dalam tomat dapat melemahkan kanker rongga mulut, tenggorokan, lambung, usus besar, dan prostat. Kandungan asam malat dan asam sitrat bisa memberikan saluran empedu sehingga terhindar dari batu empedu. Bagi yang menginginkan kulit kencang dan lembut, terhindar dari hipertensi, jantung lebih sehat, ada baiknya mengonsumsi tomat karena mengandung zat tomatin yang berfungsi sebagai antiinflamasi dan antipiretik. Tomat juga bisa menyembuhkan radang luka dan demam karena pigment likopen-nya kaya antibksidan, menyembangkan kadar kolesterol darah dan tekanan darah, serta melenturkan kembali sel-sel jantung yang kaku akibat endapan kolesterol dan gula darah.</label>
+                        <label class="option"><input type="radio" name="q29" value="B"> B. Siapa yang tak mengenal tomat? Jika dikonsumsi secara rutin, kita bisa memperoleh banyak manfaat darinya karena kandungan gizinya yang beragam. Kandungan asam malat dan asam sitrat bisa memberikan saluran empedu sehingga terhindar dari batu empedu. Bagi yang menginginkan kulit kencang dan lembut, terhindar dari hipertensi, jantung lebih sehat ada baiknya mengonsumsi tomat. Asam p-kumarat dan asam klorogenat dalam tomat menyembangkan kadar kolesterol darah dan tekanan darah, serta melenturkan kembali sel-sel jantung yang kaku akibat endapan kolesterol dan gula darah. Kandungan pigment likopen-nya kaya antibksidan dapat melemahkan kanker rongga mulut, tenggorokan, lambung, usus besar, dan prostat. Tomat juga bisa menyembuhkan radang luka dan demam karena mengandung zat tomatin yang berfungsi sebagai antiinflamasi dan antipiretik.</label>
+                        <label class="option"><input type="radio" name="q29" value="C"> C. Siapa yang tak mengenal tomat? Jika dikonsumsi secara rutin, kita bisa memperoleh banyak manfaat darinya karena kandungan gizinya yang beragam. Tomat bisa menyembuhkan radang luka dan demam karena mengandung zat tomatin yang berfungsi sebagai antiinflamasi dan antipiretik. Asam p-kumarat dan asam klorogenat dalam tomat dapat melemahkan semua jenis kanker, seperti rongga mulut, tenggorokan, lambung, usus besar, dan prostat. Kandungan asam malat dan asam sitrat bisa memberikan saluran empedu dan melenturkan kembali sel-sel jantung yang kaku akibat endapan kolesterol dan gula darah sehingga terhindar dari batu empedu. Bagi yang menginginkan kulit kencang dan lembut, terhindar dari hipertensi, jantung lebih sehat ada baiknya mengonsumsi tomat. Kandungan pigment likopen-nya kaya antibksidan, menyembangkan kadar kolesterol darah dan tekanan darah .</label>
+                        <label class="option"><input type="radio" name="q29" value="D"> D. Siapa yang tak mengenal tomat? Jika dikonsumsi secara rutin, kita bisa memperoleh banyak manfaat darinya karena kandungan gizinya yang beragam. Asam p-kumarat dan asam klorogenat dalam tomat dapat melemahkan kanker rongga mulut, tenggorokan, lambung, usus besar, dan prostat., Kandungan asam malat dan asam sitrat bisa memberikan saluran empedu sehingga terhindar dari batu empedu. Bagi yang menginginkan kulit kencang dan lembut, terhindar dari hipertensi, jantung lebih sehat ada baiknya mengonsumsi tomat. Kandungan pigment likopen-nya kaya antibksidan, menyembangkan kadar kolesterol darah dan tekanan darah, serta melenturkan kembali sel-sel jantung yang kaku akibat endapan kolesterol dan gula darah. Tomat juga bisa menyembuhkan radang luka dan demam karena mengandung zat tomatin yang berfungsi sebagai antiinflamasi dan antipiretik.</label>
+                    </div>
+                </div>
+
+                <!-- Soal 30 -->
+                <div class="question-container" id="q30">
+                    <div class="question-number">30. Cermatilah teks dan pernyataan berikut!</div>
+                    <div class="question-text">
+                        <table border="1" cellpadding="5" cellspacing="0" width="100%">
+                            <tr>
+                                <th width="50%">Teks</th>
+                                <th width="50%">Pernyataan</th>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>Susmi mendapat tugas Menyusun teks prosedur dan mempraktikkannya di kelas dari gurunya. Awalnya ia bingung mau membuat apa, tetapi kemudian ia ingat sirop bawang putih yang sering dibuat ibunya. Ia pun segera menyiapkan peralatan dan bahan-bahan yang diperlukan untuk membuat sirop tersebut. Ia ingin teman-temannya bisa mencicipi sirop buatannya yang kaya manfaat. Susmi menyiapkan blender kecil yang biasa dipakai ibunya dan wadah untuk sirop. Ia juga mengupas 8 siung bawang putih dan 3 cm jahe. Kedua bahan tersebut ia cuci bersih bersama satu buah lemon. Selain itu, ia juga menyiapkan 250 ml jahe. Saat praktik di kelas, Susmi memasukkan bawang putih ke dalam blender. Jahe ia parut dan peras airnya. Ia juga memeras lemon. Air perasan jahe dan lemon ia tambahkan ke dalam blender. Semua bahan tersebut ia blender sampai halus. Hasil blenderan itu ia tuang ke dalam wadah dan ia menambahkan madu ke dalamnya. Semua bahan itu ia aduk sampai benar-benar tercampur rata. Susmi menjelaskan bahwa sirop bawang putih sudah jadi dan siap dijadikan minuman. Untuk mendapatkan minuman segar, tinggal ditambahkan air dingin saja. Bagi yang sedang batuk pilek, sirop tinggal dicampur dengan air panas. Jika tidak segera digunakan, sirop harus disimpan di lemari es dalam wadah tertutup. Sayang sekali, Susmi tidak membawa air dingin dan air panas. Wadah siropnya pun tak ada tutupnya.</p>
+                                </td>
+                                <td>
+                                    <p>(1) Susmi berjanji membuatkan minuman sirop bawang putih pada kesempatan yang lain agar teman-temannya tidak kecewa.<br>
+                                    (2) Susmi minta maaf kepada teman-temannya karena tidak bisa mencicipi sirop bawang putih buatannya.<br>
+                                    (3) Susmi mengambil air dingin dan air panas ke rumahnya. Sekaligus mengambil wadah tertutup walau dia harus bolos untuk mata pelajaran berikutnya.<br>
+                                    (4) Susmi memberikan sirop bawang putih buatannya kepada gurunya agar mendapatkan nilai yang bagus.</p>
+                                </td>
+                            </tr>
+                        </table>
+                        <p>Karena Susmi tidak membawa air dingin, air panas, dan wadah tertutup, apa yang sebaiknya dilakukan Susmi karena kelalaiannya itu?</p>
+                    </div>
+                    <div class="options">
+                        <label class="option"><input type="radio" name="q30" value="A"> A. (1) dan (2)</label>
+                        <label class="option"><input type="radio" name="q30" value="B"> B. (1) dan (4)</label>
+                        <label class="option"><input type="radio" name="q30" value="C"> C. (2) dan (3)</label>
+                        <label class="option"><input type="radio" name="q30" value="D"> D. (3) dan (4)</label>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <button type="button" id="prev-btn" onclick="prevQuestion()">Sebelumnya</button>
+                    <button type="button" id="next-btn" onclick="nextQuestion()">Selanjutnya</button>
+                    <button type="button" id="submit-btn" onclick="submitExam()">Submit Jawaban</button>
+                </div>
+            </form>
+
+            <div id="result-container">
+                <h2>Hasil Ujian</h2>
+                <div id="score">Skor Anda: 0/30</div>
+                <div class="progress-container">
+                    <div id="progress-bar"></div>
+                </div>
+                <p id="result-message"></p>
+                <button type="button" onclick="resetExam()">Ulangi Ujian</button>
+            </div>
+        </div>
+
+        <div id="hasil" class="tab">
+            <h2>Hasil Ujian</h2>
+            <div id="hasil-score">Skor Anda: 0/30</div>
+            <div id="hasil-detail"></div>
+        </div>
+    </div>
+
+    <script>
+        // Variabel global
+        let currentQuestion = 1;
+        const totalQuestions = 30;
+        let answers = {};
+        let timeLeft = 60 * 60; // 60 menit dalam detik
+        let timerInterval;
+        let examSubmitted = false;
+
+        // Fungsi untuk memulai timer
+        function startTimer() {
+            timerInterval = setInterval(function() {
+                timeLeft--;
+                updateTimerDisplay();
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    if (!examSubmitted) {
+                        submitExam();
+                    }
+                }
+            }, 1000);
+        }
+
+        // Fungsi untuk memperbarui tampilan timer
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timer').textContent = `Waktu tersisa: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }
+
+        // Fungsi untuk berpindah ke tab
+        function openTab(tabName) {
+            const tabs = document.getElementsByClassName('tab');
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active-tab');
+            }
+
+            const tabButtons = document.getElementsByClassName('tab-btn');
+            for (let i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].classList.remove('active');
+            }
+
+            document.getElementById(tabName).classList.add('active-tab');
+            event.currentTarget.classList.add('active');
+        }
+
+        // Fungsi untuk menampilkan pertanyaan saat ini
+        function showQuestion(questionNumber) {
+            const questions = document.getElementsByClassName('question-container');
+            for (let i = 0; i < questions.length; i++) {
+                questions[i].style.display = 'none';
+            }
+
+            document.getElementById(`q${questionNumber}`).style.display = 'block';
+            currentQuestion = questionNumber;
+
+            // Update tombol navigasi
+            document.getElementById('prev-btn').style.display = questionNumber === 1 ? 'none' : 'inline-block';
+            document.getElementById('next-btn').style.display = questionNumber === totalQuestions ? 'none' : 'inline-block';
+            document.getElementById('submit-btn').style.display = questionNumber === totalQuestions ? 'inline-block' : 'none';
+
+            // Update progress bar
+            const progress = (questionNumber / totalQuestions) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+        }
+
+        // Fungsi untuk pindah ke pertanyaan berikutnya
+        function nextQuestion() {
+            saveAnswer(currentQuestion);
+            if (currentQuestion < totalQuestions) {
+                showQuestion(currentQuestion + 1);
+            }
+        }
+
+        // Fungsi untuk pindah ke pertanyaan sebelumnya
+        function prevQuestion() {
+            saveAnswer(currentQuestion);
+            if (currentQuestion > 1) {
+                showQuestion(currentQuestion - 1);
+            }
+        }
+
+        // Fungsi untuk menyimpan jawaban
+        function saveAnswer(questionNumber) {
+            const selectedOption = document.querySelector(`input[name="q${questionNumber}"]:checked`);
+            if (selectedOption) {
+                answers[`q${questionNumber}`] = selectedOption.value;
+            }
+        }
+
+        // Fungsi untuk submit ujian
+        function submitExam() {
+            examSubmitted = true;
+            clearInterval(timerInterval);
+
+            // Simpan jawaban terakhir
+            saveAnswer(currentQuestion);
+
+            // Hitung skor
+            let score = 0;
+            const correctAnswers = {
+                q1: "D", q2: "C", q3: "B", q4: "A", q5: "D",
+                q6: "A", q7: "C", q8: "D", q9: "D", q10: "B",
+                q11: "B", q12: "A", q13: "B", q14: "D", q15: "C",
+                q16: "A", q17: "B", q18: "A", q19: "B", q20: "A",
+                q21: "B", q22: "B", q23: "B", q24: "A", q25: "B",
+                q26: "D", q27: "C", q28: "C", q29: "D", q30: "A"
+            };
+
+            for (const question in correctAnswers) {
+                if (answers[question] === correctAnswers[question]) {
+                    score++;
+                }
+            }
+
+            // Tampilkan hasil
+            document.getElementById('score').textContent = `Skor Anda: ${score}/${totalQuestions}`;
+            document.getElementById('hasil-score').textContent = `Skor Anda: ${score}/${totalQuestions}`;
+            
+            // Hitung persentase
+            const percentage = (score / totalQuestions) * 100;
+            document.getElementById('result-message').textContent = `Anda menjawab benar ${score} dari ${totalQuestions} soal (${percentage.toFixed(1)}%)`;
+
+            // Tampilkan detail jawaban
+            let detailHtml = '<h3>Detail Jawaban:</h3><ul>';
+            for (let i = 1; i <= totalQuestions; i++) {
+                const questionKey = `q${i}`;
+                const userAnswer = answers[questionKey] || '-';
+                const isCorrect = userAnswer === correctAnswers[questionKey];
+                detailHtml += `<li>Soal ${i}: Jawaban Anda <strong>${userAnswer}</strong> (${isCorrect ? 'Benar' : 'Salah'}) - Jawaban benar: ${correctAnswers[questionKey]}</li>`;
+            }
+            detailHtml += '</ul>';
+            document.getElementById('hasil-detail').innerHTML = detailHtml;
+
+            // Sembunyikan form dan tampilkan hasil
+            document.getElementById('exam-form').style.display = 'none';
+            document.getElementById('result-container').style.display = 'block';
+            document.getElementById('timer').style.display = 'none';
+            openTab('hasil');
+        }
+
+        // Fungsi untuk reset ujian
+        function resetExam() {
+            // Reset variabel
+            currentQuestion = 1;
+            answers = {};
+            timeLeft = 60 * 60;
+            examSubmitted = false;
+
+            // Reset form
+            document.getElementById('exam-form').reset();
+            document.getElementById('exam-form').style.display = 'block';
+            document.getElementById('result-container').style.display = 'none';
+            document.getElementById('timer').style.display = 'block';
+
+            // Mulai dari awal
+            showQuestion(1);
+            startTimer();
+            updateTimerDisplay();
+            openTab('soal');
+        }
+
+        // Inisialisasi saat halaman dimuat
+        window.onload = function() {
+            showQuestion(1);
+            startTimer();
+        };
+    </script>
+</body>
+</html>
